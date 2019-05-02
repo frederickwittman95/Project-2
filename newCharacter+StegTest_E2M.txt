@@ -1,0 +1,2 @@
+Here is the stegonagraphy message we used: "Dr. Hill"
+ Here are the new characters we added: "$" "@" "%" "^" "&" "*" "!". 
