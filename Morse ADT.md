@@ -1,98 +1,58 @@
-##### Frederick Wittman, Cameron Peete, Nico Shober, Michael Kessel, and Colin Woods
+##### Frederick Wittman, Galen Damosso, Eli Oceanak, Trevor Evenson, Josh Malone
 ##### Dr. Hill
 ##### COSC 2030-01
-##### 28 March 2019
-
+##### 02 May 2019
 
 # Morse Code Abstract Data Type
 
 ## ADT Summary
 
-The Morse code abstract data type allows for conversion between arbitrarily large numbers 
+This abstract data type allows for translation between Morse code and English, and vice-versa.
 
 ## Data Items and Operations
 
 ### Data Items
 
-This steganography ADT does not include any global variables.  Major local variables in the operations encode and decode include:
+#### Node class
 
-#### message
-message is a sequentially ordered list of the bits that correspond to the ASCII characters of the secret message.
+The node class has four member variables: key, value, right child, and left child.  It does not have any member functions.  Its constructor requires initialization of the key and value fields and assigns the left child and right child fields to "None".  This node class is inflexible; it was built for a specific purpose.
 
-#### line_as_list
-line_as_list stores pixels, which are strings, as sequentially ordered lists
+#### treeRoot
+treeRoot is a global variable that serves as a pointer to the left and right subtrees of the binary search tree.  It does not contain a key or value.
 
-#### binary_array
-binary_array is a sequentially ordered list that stores the binary value of individual hexidecimal characters.
+#### table
+table is a global variable that maps English characters to Morse code sequences through the use of the dictionary class.
 
 ### Operations
 
-#### encode (in_file, out_file, message_file)
-* Parameters: a bit-map image as a read file, an empty text file to write the encoded pixels to, and a single-line message as a read file.
-* Pseudocode:
-  1. Write the lines of the image file to a list.  Originally, our team performed operations on the data taken from the image file and    wrote the output directly to the out-file.  We opted to store the pixels in an array because we felt it would make the ADT amenable to more sophisticated encryption techniques, moving forward.
-  2. Store the secret message as a list of bits corresponding to the ASCII characters.
-  3. Modify the image file's first pixel's green and blue pixels to contain the length of the message and the amount of overflow in bits, respectively.
-  4. With use of an index variable, cycle through the red, green, and blue elements for each new pixel.  Change the least significant bit of the appropriate hexidecimal character to match the corresponding bit in the secret message.
-  5. Write the altered pixels to the out-file.
-  6. If the length of the message in bits is shorter than the number of pixels, write the remaining pixels to the out-file in an unaltered state.
+#### insert (root, node)
+* Parameters: the root node of the binary tree search tree and the node to be inserted.
+* Pseudocode: The binary search tree consists of nodes with key values that consist of single characters: either "-" or ".".  The paths along the nodes of the binary search tree sequentially describe the key values of its data items.  The final node of a sequence stores the appropriate value.  search prints an error message and rejects the insertion request if the key contains a symbol that is not a dot or dash.
 
-#### decode (encoded_message, message_file)
-* Parameters: an image file that contains the secret message and a text file to write the message to
-* Pseudocode:
-  1. Read the first pixel of the encoded message and declare the length of the message and degree of overflow as variables.
-  2. With use of an index variables to point to the appropriate pixel element and to stop reading at the end of the secret message, read through the file and add the bits that correspond to the ASCII characters to a list.
-  3. Translate the bits to ASCII characters and write the secret message to the out-file.
-  4. Write the length of the message in bits and the degree of overflow in bits to the out-file.
+#### createTree (infile, root)
+* Parameters: a file containing the key-value pairs and the root of the binary search tree.
+* Pseudocode: createTree reads the key-value (Morse-English) pairs from a source file and inserts them into the binary search tree.
 
-#### ascii_to_bin (message_file)
-* Parameter: a text file
-* ascii_to_bin reads a line from its parameter and returns the line's contents as a list of binary numbers.  The list of binary numbers corresponds to the appropriate ASCII characters.  The core of the ascii_to_bin function is the from_bytes function.
+#### search (root, key)
+* Parameters: the root of the binary search tree and a Morse code key value.
+* Pseudocode: search is a recursive function that returns the English character value associated with a Morse key.  If no English character corresponds with the key in the binary search tree, an appropriate error message is returned as a string.  This would then be written to an outfile.
 
-#### binary_to_ascii (binary_number)
-* Parameter: a string
-* binary_to_ascii takes a string of binary numbers as its parameter and returns a string of the corresponding ASCII characters.  The core of the binary_to_ascii function is the from_bytes function.
+#### morseToEnglish (infile, outfile, root)
+* Parameters: a read-file containing the Morse code to be translated, a write file to write English characters to, and the root of the binary search tree.
+* Pseudocode: morseToEnglish relies on the insert, createTree, and search functions.  This function reads the infile line by line.  It ignores newline characters.  If the function encounters a sequence of Morse characters followed by a space, it writes the appropriate English character, found by search, to the outfile.  If the function encounters multiple spaces in the same scenario, it writes the English character followed by a space.
 
-#### hex_to_bin (hex_number)
-* Parameter: a string
-* hex_to_bin takes a hexidecimal number, cast as a string, and returns a binary number cast as a string.
+#### buildDict (morseTable)
+* Parameter: a file containing the key-value pairs.
+* Pseudocode: buildDict constructs a dictionary with English characters as its keys and sequences of Morse code as its values.
 
-#### bin_to_hex (bin_number)
-* Parameter: a string
-* bin_to_hex takes a binary number, cast as a string, and returns a hexidecimal number cast as a string.
+#### englishToMorse (table, infile, outfile)
+* Parameters: a dictionary with English character keys and Morse sequences for values, a read file, and a write file.
+* englishToMorse reads lines from the the read file.  If it encounters a space, it writes a space to the out file.  If it encounters a character, it looks up the appropriate Morse sequence in the table and writes it to the out file, followed by a space.  It ignores newline characters.  We thought the decision to ignore newline characters in this function as well as morseToEnglish, and to even avoid replacing them with a space in the test files, was justified because the files can in principle be translated correctly using our scheme; this can be seen in the lone test file we created.
 
-#### dec_to_hex (dec_number)
-* Parameter: a string
-* dec_to_hex takes a decimal number, cast as a string, and returns a hexidecimal number cast as a string.
+#### userInterface ()
+* Pseudocode: userInterface prompts the user for the type of translation required, and for valid read and write files, until correct input is provided.  The user can continue translating files until a sentinal value is entered.
 
-#### hex_to_dec (hex_number):
-* Parameter: a string
-* hex_to_dec takes a hexidecimal number, cast as a string, and returns a decimal number cast as a string. 
+## Enhancement
 
-## Example
-Consider the the output when the following functions are called:
-
-```encode("pixel_in.txt", "pixel_out.txt", "message_in.txt")``` 
-
-```decode("pixel_out.txt", "message_out.txt")```
-
-Below is a comparison of sections of the image file before and after the secret message has been encoded.  Notice that the pixel values have subtly changed in accordance with the scheme described above.  Additionally, note that the green and blue elements of the first pixel reflect the total number of bits in the message to be encoded, in this case "Dr. Hill", and the degree of overflow in bits, respectively.
-
-![alt text](https://github.com/frederickwittman95/Group-project-1/blob/master/photos/after_encode.PNG "Logo Title Text 1")
-![alt text](https://github.com/frederickwittman95/Group-project-1/blob/master/photos/before_encode.PNG "Logo Title Text 1")
-
-Here is the output when the encoded pixels have been decoded:
-
-![alt text](https://github.com/frederickwittman95/Group-project-1/blob/master/photos/output.PNG "Logo Title Text 1")
-
-## Suggestions for Improvement
-
-* Modify the encode, decode, and ascii_to_binary functions to allow the stenography ADT to process messages with multiple lines.
-* Add code to read pixels directly from, and write directly to, PNG images.
-
-## Citation
-
-Special thanks to jfs of stackoverflow, whose code was the inspiration for the core of the ascii_to_binary and bin_to_ascii functions.
-
-[jfs answer](https://stackoverflow.com/questions/7396849/convert-binary-to-ascii-and-vice-versa)
+We selected support for capital letters as our enhancement.  Unfortunately, there is no other way to do this other than to provide a unique signature for each captial letter.  The unique key-value pairs needed to support this operation could be loaded into the look-up table, MorseTable.txt.  Then, they would be stored in the binary search tree and the English-to-Morse-code dictionary.  From there, capital letters could be translated from Morse code to English, and vice-versa.
 
